@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.Scene?>
+
+<Scene fx:id="root" xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="com.dooditrol.snake.Controller"
+            onKeyPressed="#playerPressedKey"
+            onKeyReleased="#playerReleasedKey">
+    <VBox>
+        <Canvas fx:id="canvas" width="800" height="600" />
+    </VBox>
+</Scene>
