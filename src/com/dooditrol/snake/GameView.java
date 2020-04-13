@@ -1,5 +1,6 @@
 package com.dooditrol.snake;
 
+
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -18,14 +19,14 @@ import com.dooditrol.snake.game_logic.SnakeBodyPart;
 import com.dooditrol.snake.game_logic.Fruit;
 
 
-public class View {
+public class GameView {
     
     private double canvasWidth;
     private double canvasHeight;
     
     private GraphicsContext gc;
     
-    public View(Canvas canvas) {
+    public GameView(Canvas canvas) {
         
         canvasWidth = canvas.getWidth();
         canvasHeight = canvas.getHeight();

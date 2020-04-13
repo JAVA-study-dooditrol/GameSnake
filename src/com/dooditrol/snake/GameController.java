@@ -1,42 +1,27 @@
 package com.dooditrol.snake;
 
-import java.net.URL;
-import java.util.ResourceBundle;
+
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.KeyCode;
-import javafx.animation.AnimationTimer;
 
 
 import com.dooditrol.snake.game_logic.MoveDirection;
 import com.dooditrol.snake.game_logic.Game;
 
 
-public class Controller implements Initializable {
+public class GameController {
     
-    private View view;
     private Game game;
-    
-    private AnimationTimer timer;
     
     @FXML
     private Canvas canvas;
     
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    
+    public void setGame(Game game) {
         
-        //game = new Game(8, 4);
-        game = new Game(32, 22);
-        view = new View(canvas);
-        timer = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                update();
-            }
-        };
-        timer.start();
+        this.game = game;
     }
     
     @FXML
@@ -79,11 +64,5 @@ public class Controller implements Initializable {
                 break;
         }
             
-    }
-    
-    private void update() {
-        
-        game.update();
-        view.draw(game);
     }
 }

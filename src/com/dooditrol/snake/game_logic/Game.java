@@ -11,7 +11,6 @@ public class Game {
     private final float SLOW_TICK_INCREMENT = 0.015f;
     private final float MIDDLE_TICK_INCREMENT = 0.03f;
     private final float FAST_TICK_INCREMENT = 0.05f;
- //   private final int MAX_NUMBER_OF_FRUITS = 3;
     
     private int fieldWidth;
     private int fieldHeight;

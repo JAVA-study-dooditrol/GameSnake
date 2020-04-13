@@ -5,7 +5,7 @@
 <?import javafx.scene.Scene?>
 
 <Scene fx:id="root" xmlns:fx="http://javafx.com/fxml/1" 
-            fx:controller="com.dooditrol.snake.Controller"
+            fx:controller="com.dooditrol.snake.GameController"
             onKeyPressed="#playerPressedKey"
             onKeyReleased="#playerReleasedKey">
     <VBox>

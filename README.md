@@ -1,0 +1,1 @@
+The game "Snake". Used JavaFX SDK. Used pattern MVC.

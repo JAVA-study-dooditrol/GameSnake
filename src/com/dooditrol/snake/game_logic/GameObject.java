@@ -31,10 +31,4 @@ public abstract class GameObject {
         
         this.y = y;
     }
-    
-    /*public void setCoordinates(int x, int y) {
-        
-        this.x = x;
-        this.y = y;
-    }*/
 }
