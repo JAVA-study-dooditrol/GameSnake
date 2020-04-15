@@ -1,4 +1,4 @@
-package com.dooditrol.snake.game_logic;
+package com.dooditrol.snake.game;
 
 
 import java.util.ArrayList;
@@ -16,22 +16,6 @@ public class Snake {
         body.add(new SnakeBodyPart(x, y));
         body.add(new SnakeBodyPart(x - 1, y));
         body.add(new SnakeBodyPart(x - 2, y));        
-    }
-    
-    public void ChangeDirection(MoveDirection newDirection) {
-        
-        if (((newDirection == MoveDirection.UP) && (direction != MoveDirection.DOWN))
-                || ((newDirection == MoveDirection.DOWN) && (direction != MoveDirection.UP))
-                || ((newDirection == MoveDirection.LEFT) && (direction != MoveDirection.RIGHT))
-                || ((newDirection == MoveDirection.RIGHT) && (direction != MoveDirection.LEFT))) {
-            
-            direction = newDirection;
-        }
-    }
-    
-    public MoveDirection getDirection() {
-        
-        return direction;
     }
     
     public SnakeBodyPart getHead() {
@@ -58,8 +42,23 @@ public class Snake {
                 return true;
             }
         }
-        
         return false;
+    }
+    
+    public MoveDirection getDirection() {
+        
+        return direction;
+    }
+    
+    protected void ChangeDirection(MoveDirection newDirection) {
+        
+        if (((newDirection == MoveDirection.UP) && (direction != MoveDirection.DOWN))
+                || ((newDirection == MoveDirection.DOWN) && (direction != MoveDirection.UP))
+                || ((newDirection == MoveDirection.LEFT) && (direction != MoveDirection.RIGHT))
+                || ((newDirection == MoveDirection.RIGHT) && (direction != MoveDirection.LEFT))) {
+            
+            direction = newDirection;
+        }
     }
     
     protected void move() {
@@ -84,7 +83,6 @@ public class Snake {
                 tail.setY(body.get(0).getY());
                 break;
         }
-        
         body.add(0, tail);
     }
     
@@ -110,7 +108,6 @@ public class Snake {
                 newHead.setY(body.get(0).getY());
                 break;
         }
-        
         body.add(0, newHead);
     }
 }

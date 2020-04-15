@@ -1,8 +1,8 @@
-package com.dooditrol.snake.game_logic;
+package com.dooditrol.snake.game;
 
 public enum TypeFruit {
     
-    APPLE(10), ORANGE(20), BANANA(30);
+    APPLE(10), ORANGE(20), PLUM(30);
     
     private int price;
     

@@ -1,17 +1,12 @@
-package com.dooditrol.snake.game_logic;
+package com.dooditrol.snake.game;
 
 
 import java.util.ArrayList;
 import java.util.Random;
 
 
-public class Game {
- 
-    private final float TICK = 0.5f;
-    private final float SLOW_TICK_INCREMENT = 0.015f;
-    private final float MIDDLE_TICK_INCREMENT = 0.03f;
-    private final float FAST_TICK_INCREMENT = 0.05f;
-    
+public class Game implements Runnable{
+     
     private int fieldWidth;
     private int fieldHeight;
     
@@ -20,18 +15,27 @@ public class Game {
     private int squareOfBorders;
     private ArrayList<Fruit> fruits;
     
-    private GameState gameState;
-    private float currentTick;
-    private Random random;
+    private GameState gameState;  
     private int score;
+    private boolean newRecord;
+    private Random random;
     
+    private final String fileNameOfRecordTable = "recordTable.txt";
+    private TableOfRecords tableOfRecords;
+    
+    {
+        random = new Random();
+        tableOfRecords = new TableOfRecords(fileNameOfRecordTable);
+        newRecord = false;
+        score = 0;
+        gameState = GameState.GAME_START;
+    }
     
     public Game(int width, int height) {
         
         this.fieldHeight = height;
         this.fieldWidth = width;
         
-        random = new Random();
         borders = new ArrayList<Border>();
         
         borders.add(new Border(0, 0, fieldWidth, 1));
@@ -44,9 +48,6 @@ public class Game {
         for (Border border : borders) {
             squareOfBorders += border.getSquare();
         }
-        
-        score = 0;
-        gameState = GameState.GAME_START;
     }
     
     public int getFieldHeight() {
@@ -84,64 +85,77 @@ public class Game {
         return score;
     }
     
-    public void ChangeDirection(MoveDirection newDirection) {
+    public boolean isNewRecord() {
         
-        if (gameState == GameState.GAME_PROCESS) {
-            snake.ChangeDirection(newDirection);
-        }
+        return newRecord;
     }
     
-    public void start() {
+    public ArrayList<Record> getRecords() {
         
-        switch (gameState) {
+        return tableOfRecords.getRecords();
+    }
+    
+    public void ChangeDirectionSnake(MoveDirection newDirection) {
         
-            case GAME_START:
-            case GAME_OVER:
-            case GAME_END:
-                toStartGame();
-                break;
-            default:
-                
-                break;
-        }
+        snake.ChangeDirection(newDirection);
+    }
+    
+    public synchronized void start() {
+        
+        toStartGame();
+        notify();
     }
     
     public void restart() {
         
-        if (gameState != GameState.GAME_START) {
-            toStartGame(); 
-        }
+        toStartGame(); 
     }
     
     public void pause() {
         
-        switch (gameState) {
-        
-            case GAME_PROCESS:
-                gameState = GameState.PAUSE;
-                break;
-            case PAUSE:
-                gameState = GameState.GAME_PROCESS;
-                break;
-            default:
-                
-                break;
-        }
+        gameState = GameState.PAUSE;
     }
     
-    
-    
-    public void update() {
+    public synchronized void exitPause() {
         
-        if (gameState == GameState.GAME_PROCESS) {
-            //currentTick += MIDDLE_TICK_INCREMENT;
-            //currentTick += SLOW_TICK_INCREMENT;
-            currentTick += FAST_TICK_INCREMENT;
-            if (currentTick >= TICK) {
-                updateGameField();
-                currentTick = 0;
+        gameState = GameState.GAME_PROCESS;
+        notify();
+    }
+    
+    public void addNewRecord(String name) {
+        
+        tableOfRecords.addNewRecord(name, score);
+    }
+    
+    @Override
+    public synchronized void run() {
+        
+        while (true) {
+            
+            try {
+                switch (gameState) {
+                    case GAME_START:
+                    case PAUSE:
+                        wait();
+                        break;
+                    case GAME_OVER:
+                    case GAME_END:
+                        if (tableOfRecords.isNewRecord(score)) {
+                            newRecord = true;
+                        }
+                        wait();
+                        break;
+                    case GAME_PROCESS:
+                        updateGameField();
+                        Thread.sleep(180);
+                        break;
+                }
+            }
+            catch (InterruptedException ex) {
+                System.out.println("Thread has been interrupted");
             }
         }
+
     }
         
     private void updateGameField() {
@@ -182,6 +196,7 @@ public class Game {
                 
                 if (fruits.size() == 0) {
                     gameState = GameState.GAME_END;
+ 
                 }
                 else if (0 < (fieldWidth * fieldHeight 
                         - (squareOfBorders + snake.getLenght() + fruits.size()))) {
@@ -248,7 +263,6 @@ public class Game {
                 newFruitY = random.nextInt(fieldHeight);
             }
         }
-        
         return new Fruit(newFruitX, newFruitY, typeFruit);
     }
     
@@ -259,10 +273,10 @@ public class Game {
         
         fruits.add(toPlaceNewFruit(TypeFruit.APPLE));
         fruits.add(toPlaceNewFruit(TypeFruit.ORANGE));
-        fruits.add(toPlaceNewFruit(TypeFruit.BANANA));
+        fruits.add(toPlaceNewFruit(TypeFruit.PLUM));
         
-        currentTick = 0;
         score = 0;
+        newRecord = false;
         gameState = GameState.GAME_PROCESS;
     }
 }

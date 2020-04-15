@@ -1,77 +1,38 @@
 package com.dooditrol.snake;
 
 
-import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
-import javafx.scene.Parent;
-import javafx.scene.canvas.Canvas;
+import javafx.fxml.FXMLLoader;
 
-
-import com.dooditrol.snake.game_logic.Game;
+import com.dooditrol.snake.game.Game;
 
 
 public class Main extends Application {
 
-    private Game game;
-    private GameView gameView;
-    
-    private AnimationTimer timer;
-
-    
-    @Override
-    public void init() throws Exception {
-        
-        //game = new Game(8, 4);
-        game = new Game(32, 22);
-        
-        timer = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                try {
-                    update();
-                }
-                catch (Exception ex){
-                    System.out.println(ex.getMessage());
-                }
-            }
-        };
-        
-        
-        super.init();
-    }
+    static private Game game;
+    static private GameView gameView;
     
     @Override
     public void start(Stage stage) throws Exception {
         
-        FXMLLoader loaderOfGameScene = new FXMLLoader(getClass().
+        FXMLLoader gameSceneLoader = new FXMLLoader(getClass().
                 getResource("..\\..\\..\\res\\GameScreenLayout.fxml"));        
-        Scene gameScene = loaderOfGameScene.load();
-
-        GameController gameController = loaderOfGameScene.getController();
-        gameController.setGame(game);
-        
-        
-        Parent root = gameScene.getRoot();
-        gameView = new GameView((Canvas)root.getChildrenUnmodifiable().get(0));
+        Scene gameScene = gameSceneLoader.load();
+        ((GameController) gameSceneLoader.getController()).setGame(game);
         
         stage.setScene(gameScene);
-        stage.setTitle("Snake");
-        stage.show();
-        
-        timer.start();
+        gameView = new GameView(stage, game);
     }
     
     public static void main(String[] args) {
         
-        Application.launch(args);
-    }
-    
-    private void update() throws Exception {
+        game = new Game(32, 22);
+        Thread gameThread = new Thread(game, "GameThread");
+        gameThread.setDaemon(true);
+        gameThread.start();
         
-        game.update();
-        gameView.draw(game);
+        Application.launch(args);
     }
 }

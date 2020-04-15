@@ -1,4 +1,4 @@
-package com.dooditrol.snake.game_logic;
+package com.dooditrol.snake.game;
 
 
 public class SnakeBodyPart extends GameObject {

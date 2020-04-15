@@ -1,14 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.Scene?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.Region?>
 
 <Scene fx:id="root" xmlns:fx="http://javafx.com/fxml/1" 
             fx:controller="com.dooditrol.snake.GameController"
-            onKeyPressed="#playerPressedKey"
             onKeyReleased="#playerReleasedKey">
-    <VBox>
+    <Group>
         <Canvas fx:id="canvas" width="800" height="600" />
-    </VBox>
+        <VBox fx:id="inputRecord" layoutX="320" layoutY="200" visible="false" alignment="center"
+                spacing="5" style="-fx-background-color: yellow">
+	        <Label text="NEW RECORD"/>
+	        <Label text="Enter a name for the record." alignment="center"/>
+	        <TextField fx:id="field" alignment="center"/>
+	        <HBox>
+	            <Button fx:id="enterButton" alignment="center_left" text="enter" 
+	                    onAction="#clickEnterButton"/>
+	            <Region HBox.hgrow="always"/>
+	            <Button fx:id="refuseButton" alignment="center_right" text="refuse" 
+	                    onAction="#clickRefuseButton"/>     
+	        </HBox>
+        </VBox>
+    </Group>
 </Scene>
