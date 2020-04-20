@@ -1,9 +1,10 @@
 package com.dooditrol.snake.game;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.FileReader;
-import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -24,40 +25,55 @@ public class TableOfRecords {
         
         this.fileOfTable = new File(fileName);
         
-        if (!fileOfTable.exists()) {
+        if (fileOfTable.exists()) {
+            
+            try (FileInputStream fis = new FileInputStream(fileOfTable);
+                    ObjectInputStream ois = new ObjectInputStream(fis)) {
+                                
+                int numberRecords = ois.readInt();
+                
+                for (int i = 0; i < numberRecords; ++i) {
+                    
+                    records.add((Record) ois.readObject());
+                }
+                
+                if (numberRecords == MAX_NUMBER_OF_RECORDS) {
+                    minScore = records.get(records.size() - 1).getScore();
+                }
+            }
+            catch (IOException ex) {
+                System.out.println(ex.getMessage());
+            }
+            catch (ClassNotFoundException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+        else {
+            
             try {
                 fileOfTable.createNewFile();
             }
             catch (IOException ex) {
                 System.out.println(ex.getMessage());
             }
-        }
-        
-        try (FileReader fr = new FileReader(fileOfTable);
-                BufferedReader reader = new BufferedReader(fr)) {
             
-            String line = reader.readLine();
-            
-            for (int i = 0; i < MAX_NUMBER_OF_RECORDS; i++) {
+            try (FileOutputStream fos = new FileOutputStream(fileOfTable);
+                    ObjectOutputStream oos = new ObjectOutputStream(fos)) {
                 
-                if (line != null) {
-                    String[] itemsOfRecord = line.split("\\s");
-                    int score = Integer.parseInt(itemsOfRecord[1], 10);
-                    records.add(new Record(itemsOfRecord[0], score));
-                    minScore = score;
-                    line = reader.readLine();
-                }
-                else {
-                    records.add(new Record("---", 0));
-                }
+                oos.writeInt(0);
             }
-        }
-        catch (IOException ex) {
-            System.out.println(ex.getMessage());
+            catch (IOException ex) {
+                System.out.println(ex.getMessage());
+            }
         }
     }
     
-    public ArrayList<Record> getRecords() {
+    protected int getMaxSizeTable() {
+        
+        return MAX_NUMBER_OF_RECORDS;
+    }
+    
+    protected ArrayList<Record> getRecords() {
         
         return records;
     }
@@ -66,7 +82,7 @@ public class TableOfRecords {
         
         if ((score != 0) 
                 && ((score > minScore) 
-                        || (score == minScore && records.get(records.size() - 1).getScore() == 0))) {
+                        || (score == minScore && records.size() < MAX_NUMBER_OF_RECORDS))) {
             return true;
         }
         else {
@@ -76,26 +92,40 @@ public class TableOfRecords {
     
     protected void addNewRecord(String nameOfRecord, int score) {
         
-        for (int i = 0; i < records.size(); ++i) {
+        if (records.size() > 0) {
+            int i = 0;
             
-            if (records.get(i).getScore() < score) {
-                records.add(i, new Record(nameOfRecord, score));
-                records.remove(records.size() - 1);
-                break;
+            for (; i < records.size(); ++i) {
+                
+                if (records.get(i).getScore() < score) {
+                    break;
+                }
             }
+            records.add(i, new Record(nameOfRecord, score));
         }
-        minScore = records.get(records.size() - 1).getScore();
+        else {
+            records.add(new Record(nameOfRecord, score));
+        }
         
-        try (FileWriter writer = new FileWriter(fileOfTable, false)){
+        if (records.size() > MAX_NUMBER_OF_RECORDS) {
+            records.remove(records.size() - 1);
+            minScore = records.get(records.size() - 1).getScore();
+        }
+        
+        try (FileOutputStream fos = new FileOutputStream(fileOfTable);
+                ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+            
+            oos.writeInt(records.size());
             
             for (Record record : records) {
                 
-                writer.write(record.getName());
-                writer.write(" ");
-                writer.write(Integer.toString(record.getScore()));
-                writer.write("\n");                
+                if (record.getScore() == 0) {
+                    break;
+                }
+                else {
+                    oos.writeObject(record);
+                }
             }
-            
         }
         catch (IOException ex) {
             System.out.println(ex.getMessage());

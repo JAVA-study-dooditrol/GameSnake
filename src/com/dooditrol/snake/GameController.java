@@ -16,6 +16,8 @@ import com.dooditrol.snake.game.MoveDirection;
 public class GameController {
     
     private Game game;
+    private boolean escapePressed;
+    private boolean rPressed;
     
     @FXML
     private Canvas canvas;
@@ -28,13 +30,19 @@ public class GameController {
     @FXML
     private TextField field;
     
+    
+    {
+        escapePressed = false;
+        rPressed = false;
+    }
+    
     public void setGame(Game game) {
         
         this.game = game;
     }
     
     @FXML
-    private void playerReleasedKey(KeyEvent event) {
+    private void playerPressedKey(KeyEvent event) {
         
         if (inputRecord.isVisible()) {
             return;
@@ -64,10 +72,16 @@ public class GameController {
                         game.ChangeDirectionSnake(MoveDirection.RIGHT);
                         break;
                     case R:
-                        game.restart();
+                        if (!rPressed) {
+                            rPressed = true;
+                            game.restart();
+                        }
                         break;
                     case ESCAPE:
-                        game.pause();
+                        if (!escapePressed) {
+                            escapePressed = true;
+                            game.pause();
+                        }
                         break;
                     default:
                         break;
@@ -76,10 +90,16 @@ public class GameController {
             case PAUSE:
                 switch (event.getCode()) {
                     case ESCAPE:
-                        game.exitPause();
+                        if (!escapePressed) {
+                            escapePressed = true;
+                            game.exitPause();
+                        }
                         break;
                     case R:
-                        game.start();
+                        if (!rPressed) {
+                            rPressed = true;
+                            game.start();
+                        }
                         break;
                     default:
                         break;
@@ -89,6 +109,7 @@ public class GameController {
             case GAME_END:
                 switch (event.getCode()) {
                     case R:
+                        rPressed = true;
                     case ENTER:
                         game.start();
                     default:
@@ -99,15 +120,67 @@ public class GameController {
     }
     
     @FXML
+    private void playerReleasedKey(KeyEvent event) {
+        
+        if (inputRecord.isVisible()) {
+            return;
+        }
+        
+        switch (game.getGameState()) {
+            case GAME_PROCESS:
+                switch (event.getCode()) {
+                    case R:
+                        rPressed = false;
+                        break;
+                    case ESCAPE:
+                        escapePressed = false;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case PAUSE:
+                switch (event.getCode()) {
+                    case ESCAPE:
+                        escapePressed = false;
+                        break;
+                    case R:
+                        rPressed = false;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case GAME_OVER:
+            case GAME_END:
+                switch (event.getCode()) {
+                    case R:
+                        rPressed = false;
+                    default:
+                        break;
+                }
+                break;
+            default:
+                break;
+        } 
+    }
+    
+    @FXML
     private void clickEnterButton(ActionEvent e) {
         
-        game.addNewRecord(field.getCharacters().toString());
-        inputRecord.setVisible(false);
+        String name = field.getCharacters().toString();
+        
+        if (name.length() > 0) {
+            game.addNewRecord(name);
+            inputRecord.setVisible(false);
+            field.clear();
+        }
     }
     
     @FXML
     private void clickRefuseButton(ActionEvent e) {
         
         inputRecord.setVisible(false);
+        field.clear();
     }
 }

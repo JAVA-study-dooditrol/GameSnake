@@ -12,6 +12,7 @@
 
 <Scene fx:id="root" xmlns:fx="http://javafx.com/fxml/1" 
             fx:controller="com.dooditrol.snake.GameController"
+            onKeyPressed="#playerPressedKey"
             onKeyReleased="#playerReleasedKey">
     <Group>
         <Canvas fx:id="canvas" width="800" height="600" />

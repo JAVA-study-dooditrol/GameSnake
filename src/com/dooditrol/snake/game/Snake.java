@@ -6,16 +6,21 @@ import java.util.ArrayList;
 
 public class Snake {
 
-    ArrayList<SnakeBodyPart> body;
-    MoveDirection direction;
+    private ArrayList<SnakeBodyPart> body;
+    private MoveDirection direction;
+    private int widthField;
+    private int heightField;
     
-    public Snake(int x, int y) {
+    
+    public Snake(int x, int y, int width, int height) {
         
+        widthField = width;
+        heightField = height;
         direction = MoveDirection.RIGHT;
         body = new ArrayList<SnakeBodyPart>();
-        body.add(new SnakeBodyPart(x, y));
-        body.add(new SnakeBodyPart(x - 1, y));
-        body.add(new SnakeBodyPart(x - 2, y));        
+        body.add(new SnakeBodyPart(x, y, widthField, heightField));
+        body.add(new SnakeBodyPart(x - 1, y, widthField, heightField));
+        body.add(new SnakeBodyPart(x - 2, y, widthField, heightField));        
     }
     
     public SnakeBodyPart getHead() {
@@ -63,51 +68,16 @@ public class Snake {
     
     protected void move() {
         
-        SnakeBodyPart tail = body.remove(body.size() - 1);
-        
-        switch (direction) {
-            case UP:
-                tail.setX(body.get(0).getX());
-                tail.setY(body.get(0).getY() - 1);
-                break;
-            case DOWN:
-                tail.setX(body.get(0).getX());
-                tail.setY(body.get(0).getY() + 1);
-                break;
-            case LEFT:
-                tail.setX(body.get(0).getX() - 1);
-                tail.setY(body.get(0).getY());
-                break;
-            case RIGHT:
-                tail.setX(body.get(0).getX() + 1);
-                tail.setY(body.get(0).getY());
-                break;
-        }
-        body.add(0, tail);
+        body.remove(body.size() - 1);
+        SnakeBodyPart newHead = body.get(0).clone();
+        newHead.move(direction);        
+        body.add(0, newHead);
     }
     
     protected void eat() {
         
-        SnakeBodyPart newHead = new SnakeBodyPart(0, 0);
-        
-        switch (direction) {
-            case UP:
-                newHead.setX(body.get(0).getX());
-                newHead.setY(body.get(0).getY() - 1);
-                break;
-            case DOWN:
-                newHead.setX(body.get(0).getX());
-                newHead.setY(body.get(0).getY() + 1);
-                break;
-            case LEFT:
-                newHead.setX(body.get(0).getX() - 1);
-                newHead.setY(body.get(0).getY());
-                break;
-            case RIGHT:
-                newHead.setX(body.get(0).getX() + 1);
-                newHead.setY(body.get(0).getY());
-                break;
-        }
+        SnakeBodyPart newHead = body.get(0).clone();
+        newHead.move(direction);
         body.add(0, newHead);
     }
 }

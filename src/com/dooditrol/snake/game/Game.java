@@ -11,6 +11,7 @@ public class Game implements Runnable{
     private int fieldHeight;
     
     private Snake snake;
+    private boolean canChangeDirection;
     private ArrayList<Border> borders;
     private int squareOfBorders;
     private ArrayList<Fruit> fruits;
@@ -20,8 +21,9 @@ public class Game implements Runnable{
     private boolean newRecord;
     private Random random;
     
-    private final String fileNameOfRecordTable = "recordTable.txt";
+    private final String fileNameOfRecordTable = "recordTable.dat";
     private TableOfRecords tableOfRecords;
+    
     
     {
         random = new Random();
@@ -38,10 +40,28 @@ public class Game implements Runnable{
         
         borders = new ArrayList<Border>();
         
-        borders.add(new Border(0, 0, fieldWidth, 1));
+        /*borders.add(new Border(0, 0, fieldWidth, 1));
         borders.add(new Border(0, fieldHeight - 1, fieldWidth, 1));
         borders.add(new Border(0, 1, 1, fieldHeight - 2));
-        borders.add(new Border(fieldWidth - 1, 1, 1, fieldHeight - 2));
+        borders.add(new Border(fieldWidth - 1, 1, 1, fieldHeight - 2));*/
+        
+        borders.add(new Border(0, 0, fieldWidth / 4 - 2, 1));
+        borders.add(new Border(fieldWidth / 4 + 2, 0, 2 * (fieldWidth / 4) - 4, 1));
+        borders.add(new Border(3 * (fieldWidth / 4) + 2, 0, fieldWidth / 4 - 2, 1));
+        
+        borders.add(new Border(0, fieldHeight - 1, fieldWidth / 4 - 2, 1));
+        borders.add(new Border(fieldWidth / 4 + 2, fieldHeight - 1, 2 * fieldWidth / 4 - 4, 1));
+        borders.add(new Border(3 * fieldWidth / 4 + 2, fieldHeight - 1, fieldWidth / 4 - 2, 1));
+        
+        borders.add(new Border(0, 1, 1, fieldHeight / 4 - 2));
+        borders.add(new Border(0, fieldHeight / 4 + 2, 1, 2 * (fieldHeight / 4) - 2));
+        borders.add(new Border(0, 3 * (fieldHeight / 4) + 3, 1, fieldHeight / 4 - 2));
+                
+        borders.add(new Border(fieldWidth - 1, 1, 1, fieldHeight / 4 - 2));
+        borders.add(new Border(fieldWidth - 1, fieldHeight / 4 + 2, 1, 2 * (fieldHeight / 4) - 2));
+        borders.add(new Border(fieldWidth - 1, 3 * (fieldHeight / 4) + 3, 1, fieldHeight / 4 - 2));
+        
+        borders.add(new Border(fieldWidth / 4 + 4, fieldHeight / 2 - 2, 2 * (fieldWidth / 4) - 8, 4));
         
         squareOfBorders = 0;
         
@@ -90,6 +110,11 @@ public class Game implements Runnable{
         return newRecord;
     }
     
+    public int getMaxSizeTableOfRecords() {
+        
+        return tableOfRecords.getMaxSizeTable();
+    }
+    
     public ArrayList<Record> getRecords() {
         
         return tableOfRecords.getRecords();
@@ -97,7 +122,10 @@ public class Game implements Runnable{
     
     public void ChangeDirectionSnake(MoveDirection newDirection) {
         
-        snake.ChangeDirection(newDirection);
+        if (canChangeDirection) {
+            snake.ChangeDirection(newDirection);
+            canChangeDirection = false;
+        }
     }
     
     public synchronized void start() {
@@ -148,6 +176,7 @@ public class Game implements Runnable{
                     case GAME_PROCESS:
                         updateGameField();
                         Thread.sleep(180);
+                        canChangeDirection = true;
                         break;
                 }
             }
@@ -160,22 +189,8 @@ public class Game implements Runnable{
         
     private void updateGameField() {
         
-        SnakeBodyPart snakeHead = snake.getHead();
-        
-        switch (snake.getDirection()) {
-            case UP:
-                snakeHead.setY(snakeHead.getY() - 1);
-                break;
-            case DOWN:
-                snakeHead.setY(snakeHead.getY() + 1);
-                break;
-            case LEFT:
-                snakeHead.setX(snakeHead.getX() - 1);
-                break;
-            case RIGHT:
-                snakeHead.setX(snakeHead.getX() + 1);
-                break;
-        }
+        SnakeBodyPart snakeHead = snake.getHead();;
+        snakeHead.move(snake.getDirection());
         
         for (Border border : borders) {
             
@@ -184,7 +199,6 @@ public class Game implements Runnable{
                 return;
             }
         }
-        
         boolean snakeAte = false;
         
         for (int i = 0; i < fruits.size(); ++i) {
@@ -249,7 +263,6 @@ public class Game implements Runnable{
             
             gameField[fruit.getY()][fruit.getX()] = true;
         }
-        
         int newFruitX = random.nextInt(fieldWidth);
         int newFruitY = random.nextInt(fieldHeight);
         
@@ -268,7 +281,8 @@ public class Game implements Runnable{
     
     private void toStartGame() {
         
-        snake = new Snake(fieldWidth / 2, fieldHeight / 2);
+        snake = new Snake(fieldWidth / 2 - 4, fieldHeight / 2 - 4, fieldWidth, fieldHeight);
+        canChangeDirection = true;
         fruits = new ArrayList<Fruit>();
         
         fruits.add(toPlaceNewFruit(TypeFruit.APPLE));

@@ -3,14 +3,20 @@ package com.dooditrol.snake.game;
 
 public class SnakeBodyPart extends GameObject {
 
-    public SnakeBodyPart(int x, int y) {
+    private int widthField;
+    private int heightField;
+    
+    
+    public SnakeBodyPart(int x, int y, int width, int height) {
         
         super(x, y);
+        widthField = width;
+        heightField = height;
     }
     
     public SnakeBodyPart clone() {
         
-        return new SnakeBodyPart(getX(), getY());
+        return new SnakeBodyPart(getX(), getY(), widthField, heightField);
     }
     
     protected void move(MoveDirection direction) {
@@ -18,15 +24,31 @@ public class SnakeBodyPart extends GameObject {
         switch (direction) {
             case LEFT:
                 setX(getX() - 1);
+                
+                if (getX() < 0) {
+                    setX(widthField - 1);
+                }
                 break;
             case RIGHT:
                 setX(getX() + 1);
+                
+                if (getX() > (widthField - 1)) {
+                    setX(0);
+                }
                 break;
             case UP:
                 setY(getY() - 1);
+                
+                if (getY() < 0) {
+                    setY(heightField - 1);
+                }
                 break;
             case DOWN:
                 setY(getY() + 1);
+                
+                if (getY() > (heightField - 1)) {
+                    setY(0);
+                }
                 break;
         }
     }

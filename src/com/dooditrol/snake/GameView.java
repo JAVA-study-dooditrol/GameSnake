@@ -23,13 +23,15 @@ import com.dooditrol.snake.game.Record;
 
 public class GameView {
     
+    private Game game;
+    private int maxSizeTable;
+    
+    private Stage stage;
     private double canvasWidth;
     private double canvasHeight;
     private double unitSize;
-    
-    private Game game;
-    private Stage stage;
     private GraphicsContext gc;
+    
     private AnimationTimer timer;
     
     private boolean fieldInputRecordIsDisplaing;
@@ -52,9 +54,10 @@ public class GameView {
     
     public GameView(Stage initStage, Game initGame) throws Exception {
         
-        this.game = initGame;
-        this.stage = initStage;
+        game = initGame;
+        maxSizeTable = game.getMaxSizeTableOfRecords();
         
+        stage = initStage;
         Canvas canvas = (Canvas) stage.getScene().getRoot().getChildrenUnmodifiable().get(0);
         canvasWidth = canvas.getWidth();
         canvasHeight = canvas.getHeight();  
@@ -189,8 +192,8 @@ public class GameView {
         
         gc.setFill(Color.BLUE);
         gc.setFont(new Font("impact", 1.5 * unitSize));
-        gc.fillText("YOUR SCORE", canvasWidth / 2 - 1.75 * unitSize, canvasHeight / 2 + unitSize);
-        gc.fillText(Integer.toString(game.getScore()), canvasWidth / 2 + 4.5 * unitSize, 
+        gc.fillText("YOUR SCORE", canvasWidth / 2 - 2 * unitSize, canvasHeight / 2 + unitSize);
+        gc.fillText(Integer.toString(game.getScore()), canvasWidth / 2 + 4.75 * unitSize, 
                 canvasHeight / 2 + unitSize);
         
         gc.setFill(Color.BLUE);
@@ -219,8 +222,8 @@ public class GameView {
         
         gc.setFill(Color.BLUE);
         gc.setFont(new Font("impact", 1.5 * unitSize));
-        gc.fillText("YOUR SCORE", canvasWidth / 2 - 1.75 * unitSize, canvasHeight / 2 + unitSize);
-        gc.fillText(Integer.toString(game.getScore()), canvasWidth / 2 + 4.5 * unitSize, 
+        gc.fillText("YOUR SCORE", canvasWidth / 2 - 2 * unitSize, canvasHeight / 2 + unitSize);
+        gc.fillText(Integer.toString(game.getScore()), canvasWidth / 2 + 4.75 * unitSize, 
                 canvasHeight / 2 + unitSize);
         
         gc.setFill(Color.BLUE);
@@ -246,21 +249,49 @@ public class GameView {
         gc.setFill(Color.OLIVEDRAB);
         
         for (SnakeBodyPart snakePart : snake.getBody()) {
-            /*gc.arc(snakePart.getX() * unitSize + unitSize / 2, 
-                    snakePart.getY() * unitSize + unitSize / 2, 
-                    unitSize / 2, unitSize / 2, 0, 360);*/
             gc.fillOval(snakePart.getX() * unitSize, 2 * unitSize + snakePart.getY() * unitSize,
                     unitSize, unitSize);
         }
         
         SnakeBodyPart snakeHead = snake.getHead();
         
-        gc.setFill(Color.OLIVEDRAB);
-       /* gc.arc(snakeHead.getX() * unitSize + unitSize / 2, 
-                snakeHead.getY() * unitSize + unitSize / 2, 
-                unitSize / 2, unitSize / 2, 0, 360);*/
-        gc.fillOval(snakeHead.getX() * unitSize, 2 * unitSize + snakeHead.getY() * unitSize, 
-                unitSize, unitSize);
+        gc.setFill(Color.RED);
+        
+        switch (snake.getDirection()) {
+            case LEFT:
+                gc.fillOval(snakeHead.getX() * unitSize + 0.5 * unitSize - 0.2 * unitSize,
+                        2 * unitSize + snakeHead.getY() * unitSize + 0.1 * unitSize,
+                        0.2 * unitSize, 0.2 * unitSize);
+                gc.fillOval(snakeHead.getX() * unitSize + 0.5 * unitSize - 0.2 * unitSize,
+                        2 * unitSize + snakeHead.getY() * unitSize + 0.7 * unitSize,
+                        0.2 * unitSize, 0.2 * unitSize);
+                break;
+            case RIGHT:
+                gc.fillOval(snakeHead.getX() * unitSize + 0.5 * unitSize,
+                        2 * unitSize + snakeHead.getY() * unitSize + 0.1 * unitSize,
+                        0.2 * unitSize, 0.2 * unitSize);
+                gc.fillOval(snakeHead.getX() * unitSize + 0.5 * unitSize,
+                        2 * unitSize + snakeHead.getY() * unitSize + 0.7 * unitSize,
+                        0.2 * unitSize, 0.2 * unitSize);
+                
+                break;
+            case UP:
+                gc.fillOval(snakeHead.getX() * unitSize + 0.1 * unitSize,
+                        2 * unitSize + snakeHead.getY() * unitSize + 0.5 * unitSize - 0.2 * unitSize,
+                        0.2 * unitSize, 0.2 * unitSize);
+                gc.fillOval(snakeHead.getX() * unitSize + 0.7 * unitSize,
+                        2 * unitSize + snakeHead.getY() * unitSize + 0.5 * unitSize - 0.2 * unitSize,
+                        0.2 * unitSize, 0.2 * unitSize);
+                break;
+            case DOWN:
+                gc.fillOval(snakeHead.getX() * unitSize + 0.1 * unitSize,
+                        2 * unitSize + snakeHead.getY() * unitSize + 0.5 * unitSize,
+                        0.2 * unitSize, 0.2 * unitSize);
+                gc.fillOval(snakeHead.getX() * unitSize + 0.7 * unitSize,
+                        2 * unitSize + snakeHead.getY() * unitSize + 0.5 * unitSize,
+                        0.2 * unitSize, 0.2 * unitSize);
+                break;
+        }
     }
     
     private void draw(ArrayList<Fruit> fruits) {
@@ -305,7 +336,7 @@ public class GameView {
     
     private void draw(ArrayList<Record> records, double x, double y) {
         
-        double heightOfTable = records.size() * (0.8 * unitSize) + unitSize;
+        double heightOfTable = maxSizeTable * (0.8 * unitSize) + unitSize;
         double widthOfTable = 8 * unitSize;
         
         gc.setFill(Color.color(0.144, 0.144, 0.144, 0.8));
@@ -330,18 +361,25 @@ public class GameView {
             gc.setFill(Color.BLUE);
             gc.fillText(Integer.toString(number) + ".", leftX, curY);
             
-            if (record.getScore() != 0) {
-                gc.setFill(Color.FIREBRICK);
-                gc.setTextAlign(TextAlignment.LEFT);
-                gc.fillText(record.getName(), leftX + unitSize, curY);
-                
-                gc.setFill(Color.RED);
-                gc.setTextAlign(TextAlignment.RIGHT);
-                gc.fillText(Integer.toString(record.getScore()), rightX, curY);
-            }
+            gc.setFill(Color.FIREBRICK);
+            gc.setTextAlign(TextAlignment.LEFT);
+            gc.fillText(record.getName(), leftX + unitSize, curY);
+            
+            gc.setFill(Color.RED);
+            gc.setTextAlign(TextAlignment.RIGHT);
+            gc.fillText(Integer.toString(record.getScore()), rightX, curY);
             
             curY += 0.7 * unitSize;
             number++;
-        }   
+        }  
+        
+        for (; number <= maxSizeTable; ++number) {
+            
+            gc.setTextAlign(TextAlignment.LEFT);
+            gc.setFill(Color.BLUE);
+            gc.fillText(Integer.toString(number) + ".", leftX, curY);
+            
+            curY += 0.7 * unitSize;
+        }
     }
 }
